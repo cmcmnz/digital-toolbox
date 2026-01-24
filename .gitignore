@@ -35,3 +35,10 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# 3D Models and Configs
+*.obj
+!test.obj
+skeleton_*.json
+!skeleton_test.json
+

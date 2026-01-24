@@ -409,9 +409,21 @@ class MechScalerApp:
         self.dragged_joint = None
         self.save_config()
 
+    def get_config_path(self):
+        # Config name = skeleton_<obj_filename_stem>.json
+        # e.g. rpo.obj -> skeleton_rpo.json
+        base_name = os.path.basename(self.obj_path)
+        stem = os.path.splitext(base_name)[0]
+        config_name = f"skeleton_{stem}.json"
+        
+        # Look for it in the same directory as the obj path
+        # (which we enforce is the script directory in main)
+        return os.path.join(os.path.dirname(self.obj_path), config_name)
+
     def load_config(self):
-        p = os.path.join(os.path.dirname(self.obj_path), "skeleton_config.json")
+        p = self.get_config_path()
         if os.path.exists(p):
+            print(f"Loading config from {p}")
             try:
                 with open(p, 'r') as f:
                     data = json.load(f)
@@ -421,17 +433,31 @@ class MechScalerApp:
                                 self.skeleton_ratios[k] = (v[0], v[1], 0.5)
                             else:
                                 self.skeleton_ratios[k] = tuple(v)
-            except: pass
+            except Exception as e:
+                print(f"Error loading config: {e}")
 
     def save_config(self):
-        p = os.path.join(os.path.dirname(self.obj_path), "skeleton_config.json")
+        p = self.get_config_path()
         try:
             with open(p, 'w') as f: json.dump(self.skeleton_ratios, f, indent=4)
-        except: pass
+            print(f"Saved config to {p}")
+        except Exception as e:
+            print(f"Error saving config: {e}")
 
 if __name__ == "__main__":
-    path = r"d:\VaultZero\Systems\000 Works In Progress\Mechagodzilla\ready-player-one-mechagodzilla\source\rpo\rpo.obj"
-    if len(sys.argv) > 1: path = sys.argv[1]
+    if len(sys.argv) < 2:
+        print("Usage: python mech_scaler.py <filename.obj>")
+        print("Error: No OBJ file specified.")
+        sys.exit(1)
+        
+    filename = sys.argv[1]
+    # Always look for the file in the same directory as the script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(script_dir, filename)
+    
+    if not os.path.exists(path):
+        print(f"Error: File not found: {path}")
+        sys.exit(1)
     
     root = tk.Tk()
     app = MechScalerApp(root, path)

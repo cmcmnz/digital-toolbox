@@ -8,11 +8,18 @@ A Python/Tkinter tool for visualizing and scaling the Mechagodzilla 3D model (Re
 - **Scaling Calculator**: Adjust total height to see resulting dimensions and limb lengths in cm and studs.
 - **Persistence**: Remembers joint positions relative to the model (stored in `skeleton_config.json` next to the model file).
 
+## Requirements
+- **Python 3.x**
+- **Tkinter** (Usually included with Python)
+
 ## Usage
-Run the script with the path to your OBJ file:
+1.  Place your `.obj` model file in the **same folder** as `mech_scaler.py`.
+2.  Run the script providing the filename:
 
 ```powershell
-python mech_scaler.py "path/to/model.obj"
+python mech_scaler.py model.obj
 ```
 
-If no argument is provided, it defaults to the project path in `d:\VaultZero\Systems\000 Works In Progress\Mechagodzilla\...`.
+If no file is specified, the script will print usage instructions and exit.
+
+**Note**: The script will generate/read a `skeleton_config.json` file in the same directory to save your joint positions.
