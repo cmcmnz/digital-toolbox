@@ -23,7 +23,6 @@ class WheatstoneBridgeApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Wheatstone Bridge Tool")
-        # Set size to 16:9 ratio (e.g., 1280x720)
         self.resize(1280, 720)
 
         # Default values
@@ -32,7 +31,7 @@ class WheatstoneBridgeApp(QMainWindow):
         self.gauge_factor = 2.0
         self.active_gauges = 1
         self.is_shunt_connected = False
-        self.strain_percent = 0.0 # Full scale -100% to 100%
+        self.strain_percent = 0.0 # scale -10% to 10%
         
         self.specimen_width = 50.0
         self.specimen_height = 150.0
@@ -184,9 +183,8 @@ class WheatstoneBridgeApp(QMainWindow):
             self.r2 = self.base_resistance
             
             if self.active_gauges == 2:
-                # Assuming R3 is the second active gauge (half bridge)
-                # In common half-bridge, R1 and R3 might be active
-                # If R1 and R3 are in opposite arms, they add up.
+                # R3 is the second active gauge (half bridge)
+                # As R1 and R3 are in opposite arms, they add up.
                 self.r3 = self.base_resistance * (1.0 + self.gauge_factor * strain)
             else:
                 self.r3 = self.base_resistance
@@ -200,7 +198,7 @@ class WheatstoneBridgeApp(QMainWindow):
             
             # Calculate Total Displayed Strain
             # If shunt is connected, it adds an equivalent strain: eps_eq = -Rg / (GF * (Rg + Rs))
-            # We display the sum of slider strain and shunt induced strain
+            # Display the sum of slider strain and shunt induced strain
             total_strain_ratio = strain
             if self.is_shunt_connected:
                 induced_strain = -self.base_resistance / (self.gauge_factor * (self.base_resistance + self.shunt_value))
@@ -221,18 +219,9 @@ class WheatstoneBridgeApp(QMainWindow):
             pass
 
     def update_slider_style(self, value):
-        # We want the handle to stay grey.
-        # The line between center and handle should change color.
-        # QSS sub-controls: add-page and sub-page can be used, but they are relative to handle.
-        # For a center-based color, we need a more complex QSS or a custom slider.
-        # Since we use -1000 to 1000:
-        # If value > 0: part between center and handle is green.
-        # If value < 0: part between center and handle is red.
-        
-        # A simple trick with QSS sub-page/add-page works for 0..100 sliders.
-        # For -X..X, it's harder with pure QSS.
-        # Let's use a background gradient on the groove that "moves" or shifts.
-        
+        # value > 0: section between center and handle is green.
+        # value < 0: section between center and handle is red.
+              
         pct = (value + 1000) / 2000.0 * 100
         center_pct = 50.0
         
@@ -312,11 +301,7 @@ class BridgeCanvas(QWidget):
         # R3 (Bottom Right): p_bottom to p_right
         # R4 (Bottom Left): p_bottom to p_left
         
-        # Logic from user: top left is R1, then clockwise, R2, R3 and R4
-        # This implies:
-        # R1: Top to Left? No, clockwise usually means Top to Right is next.
-        # Let's follow: R1(TL), R2(TR), R3(BR), R4(BL)
-        # R1: Node Top to Node Left? Let's check typical diamond.
+        # Order: R1(TL), R2(TR), R3(BR), R4(BL)
         # Nodes: Excitation at Top/Bottom. Output at Left/Right.
         # R1 is between Top and Left.
         # R2 is between Top and Right.
@@ -327,16 +312,15 @@ class BridgeCanvas(QWidget):
             mid_x = (p1[0] + p2[0]) / 2
             mid_y = (p1[1] + p2[1]) / 2
             
-            # Zig-zag or rectangle for resistor - slightly larger to avoid text touching
+            # Rectangle for resistor
             rw, rh = 65, 30
             
             # Calculate angle
             angle = np.degrees(np.arctan2(p2[1] - p1[1], p2[0] - p1[0]))
             
-            # Flip text for R1 and R4 if they look upside down
             # R1 is TL: p_top to p_left. p2(left) is p1(top) + (-half, half)
             # R4 is BL: p_bottom to p_left. p2(left) is p1(bottom) + (-half, -half)
-            # Let's check the angle. If angle is in range that makes text upside down, flip it.
+            # Check the angle. If text is upside down, flip it.
             text_angle = angle
             if abs(text_angle) > 90:
                 text_angle += 180
