@@ -1,5 +1,5 @@
 import sys
-import numpy as np
+import math
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -17,7 +17,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QRectF
 from PyQt6.QtGui import QColor, QPainter, QPen, QBrush, QFont
-import pyqtgraph as pg
+
 
 class WheatstoneBridgeApp(QMainWindow):
     def __init__(self):
@@ -316,7 +316,7 @@ class BridgeCanvas(QWidget):
             rw, rh = 65, 30
             
             # Calculate angle
-            angle = np.degrees(np.arctan2(p2[1] - p1[1], p2[0] - p1[0]))
+            angle = math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
             
             # R1 is TL: p_top to p_left. p2(left) is p1(top) + (-half, half)
             # R4 is BL: p_bottom to p_left. p2(left) is p1(bottom) + (-half, -half)
